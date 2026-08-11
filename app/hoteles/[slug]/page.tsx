@@ -1,6 +1,17 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { hotels } from "@/data/hotels";
+import {
+  ArrowLeft,
+  ExternalLink,
+  MapPin,
+  Phone,
+} from "lucide-react";
+import {
+  formatPhone,
+  getHotelBySlug,
+  hotels,
+} from "@/data/hotels";
+import { BrandLogo } from "@/components/BrandLogo";
 
 type PageProps = {
   params: {
@@ -15,110 +26,134 @@ export function generateStaticParams() {
 }
 
 export default function HotelDetailPage({ params }: PageProps) {
-  const hotel = hotels.find((item) => item.slug === params.slug);
+  const hotel = getHotelBySlug(params.slug);
 
   if (!hotel) {
     notFound();
   }
 
-  const phone = hotel.phone?.replace(/\s+/g, "");
+  const phone = formatPhone(hotel.phone_primary);
+
+  const tags = hotel.tags
+    .split(",")
+    .map((tag) => tag.trim())
+    .filter(Boolean);
 
   return (
-    <main className="hotelDetailPage">
-      <nav className="hotelsNav container">
-        <Link className="brand brandDark" href="/">
-          <span>¿QUÉ ME DICEN</span>
-          <strong>DE IXTLÁN?</strong>
-        </Link>
+    <main>
+      <header className="tourismHeader">
+        <div className="container tourismNav">
+          <BrandLogo />
 
-        <Link href="/hoteles" className="backHotels">
-          ← Todos los hoteles
-        </Link>
-      </nav>
+          <nav>
+            <Link href="/">Inicio</Link>
+            <Link href="/hoteles">Hospedaje</Link>
+            <Link href="/#descubre">Descubre</Link>
+            <Link href="/#planea">Planea tu viaje</Link>
+          </nav>
 
-      <section className="hotelDetailHero container">
-        <div
-          className="hotelDetailImage"
-          style={{ backgroundImage: `url(${hotel.image})` }}
-        />
-
-        <div className="hotelDetailIntro">
-          <p className="eyebrow dark">{hotel.type}</p>
-
-          <h1>{hotel.name}</h1>
-
-          <p className="hotelDetailAddress">
-            {hotel.address}
-            {hotel.neighborhood ? ` · ${hotel.neighborhood}` : ""}
-            {" · "}Ixtlán del Río
-          </p>
-
-          <p className="hotelDetailDescription">{hotel.description}</p>
-
-          <div className="hotelDetailActions">
-            {hotel.phone && (
-              <a href={`tel:+52${phone}`} className="primaryHotelAction">
-                Llamar
-              </a>
-            )}
-
-            <a
-              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-                `${hotel.name}, ${hotel.address}, Ixtlán del Río, Nayarit`
-              )}`}
-              target="_blank"
-              rel="noreferrer"
-              className="secondaryHotelAction"
-            >
-              Cómo llegar
-            </a>
-          </div>
+          <Link href="/hoteles" className="guideButton">
+            <ArrowLeft size={15} />
+            Hoteles
+          </Link>
         </div>
-      </section>
+      </header>
 
-      <section className="hotelDetailContent container">
-        <div>
-          <p className="eyebrow dark">SERVICIOS</p>
+      <section className="hotelProfile">
+        <div className="container">
+          <div className="hotelProfileGrid">
+            <div className="hotelProfileImage">
+              {hotel.image_url ? (
+                <img
+                  src={hotel.image_url}
+                  alt={hotel.name}
+                  referrerPolicy="no-referrer"
+                />
+              ) : (
+                <div className="hotelImagePlaceholder">
+                  ¿Qué me dicen de Ixtlán?
+                </div>
+              )}
+            </div>
 
-          <div className="amenitiesGrid">
-            {hotel.amenities.map((amenity) => (
-              <div key={amenity} className="amenityItem">
-                {amenity}
+            <div className="hotelProfileContent">
+              <span className="sectionKicker">
+                {hotel.subtype || "Hospedaje"}
+              </span>
+
+              <h1>{hotel.name}</h1>
+
+              <div className="hotelProfileLocation">
+                <MapPin size={17} />
+                <span>
+                  {hotel.address}
+                  {hotel.neighborhood
+                    ? ` · ${hotel.neighborhood}`
+                    : ""}
+                  {" · "}
+                  Ixtlán del Río
+                </span>
               </div>
-            ))}
+
+              <p className="hotelProfileDescription">
+                {hotel.description}
+              </p>
+
+              <div className="hotelProfileActions">
+                {hotel.phone_primary && (
+                  <a
+                    href={`tel:+52${hotel.phone_primary}`}
+                    className="primaryHotelButton"
+                  >
+                    <Phone size={17} />
+                    {phone}
+                  </a>
+                )}
+
+                {hotel.maps_search_url && (
+                  <a
+                    href={hotel.maps_search_url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="secondaryHotelButton"
+                  >
+                    <MapPin size={17} />
+                    Cómo llegar
+                  </a>
+                )}
+
+                {hotel.website && (
+                  <a
+                    href={hotel.website}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="secondaryHotelButton"
+                  >
+                    <ExternalLink size={17} />
+                    Sitio web
+                  </a>
+                )}
+              </div>
+
+              <div className="hotelProfileTags">
+                {tags.map((tag) => (
+                  <span key={tag}>{tag}</span>
+                ))}
+              </div>
+
+              <div className="hotelVerification">
+                <small>Estado de la información</small>
+                <strong>{hotel.verification_level}</strong>
+
+                {hotel.needs_local_verification === "Sí" && (
+                  <p>
+                    Algunos datos están pendientes de confirmación local.
+                  </p>
+                )}
+              </div>
+            </div>
           </div>
         </div>
-
-        <aside className="hotelContactCard">
-          <p className="hotelContactLabel">Contacto</p>
-
-          {hotel.phone && (
-            <>
-              <small>Teléfono</small>
-              <a href={`tel:+52${phone}`}>{hotel.phone}</a>
-            </>
-          )}
-
-          <small>Dirección</small>
-          <p>
-            {hotel.address}
-            <br />
-            {hotel.neighborhood}, Ixtlán del Río
-            <br />
-            Nayarit, México
-          </p>
-
-          {hotel.website && (
-            <a
-              href={hotel.website}
-              target="_blank"
-              rel="noreferrer"
-              className="hotelWebsite"
-            >
-              Sitio web ↗
-            </a>
-          )}
-        </aside>
       </section>
     </main>
   );

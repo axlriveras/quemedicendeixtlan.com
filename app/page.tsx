@@ -192,7 +192,7 @@ export default function Home() {
                 key={hotel.id}
               >
                 <div className="homeHotelImage">
-                  <img src={hotel.image} alt={hotel.name} />
+                  <img src={hotel.image_url} alt={hotel.name} />
                   <button type="button" aria-label="Agregar a favoritos">
                     <Heart size={16} />
                   </button>
@@ -207,7 +207,7 @@ export default function Home() {
                   </p>
 
                   <div className="hotelMiniFooter">
-                    <span>{hotel.type}</span>
+                    <span>{hotel.subtype}</span>
                     <strong>Ver hotel →</strong>
                   </div>
                 </div>
