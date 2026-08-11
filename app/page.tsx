@@ -1,278 +1,50 @@
 import Link from "next/link";
-import {
-  ArrowRight,
-  BedDouble,
-  CalendarDays,
-  Camera,
-  Heart,
-  Map,
-  MapPin,
-  Route,
-  Utensils,
-} from "lucide-react";
-import { BrandLogo } from "@/components/BrandLogo";
+import { ArrowRight, BedDouble, Bus, Camera, MapPin, Route, Sparkles, Utensils } from "lucide-react";
 import { TourismSearch } from "@/components/TourismSearch";
-import { featuredHotels } from "@/data/hotels";
+import { SiteHeader } from "@/components/SiteHeader";
+import { SiteFooter } from "@/components/SiteFooter";
+import { PlaceCard } from "@/components/PlaceCard";
+import { getRecordHref, getRecordsForSection } from "@/data/catalog";
 
-const experiences = [
-  {
-    title: "Dónde comer",
-    subtitle: "Sabores que enamoran",
-    href: "#",
-    image: "/images/plaza-ixtlan.jpg",
-    icon: Utensils,
-  },
-  {
-    title: "Dónde dormir",
-    subtitle: "Descansa y recarga energías",
-    href: "/hoteles",
-    image: "/images/ixtlan-pueblo-magico.jpg",
-    icon: BedDouble,
-  },
-  {
-    title: "Qué hacer",
-    subtitle: "Vive experiencias únicas",
-    href: "#imperdibles",
-    image: "/images/los-toriles.jpg",
-    icon: Camera,
-  },
+const discovery = [
+  { title: "Saborea Ixtlán", text: "Restaurantes y cocina local", href: "/restaurantes", image: "/images/plaza-ixtlan.jpg", icon: Utensils, color: "coral" },
+  { title: "Descansa aquí", text: "Hospedajes para tu visita", href: "/hoteles", image: "/images/ixtlan-pueblo-magico.jpg", icon: BedDouble, color: "magenta" },
+  { title: "Vive el destino", text: "Lugares y experiencias", href: "/experiencias", image: "/images/los-toriles.jpg", icon: Camera, color: "gold" },
 ];
 
 export default function Home() {
-  const hotels = featuredHotels.slice(0, 4);
-
+  const toriles = getRecordsForSection("atractivos").find((item) => item.slug.includes("toriles"));
+  const hotels = getRecordsForSection("hoteles").slice(0, 4);
   return (
-    <main>
-      <header className="tourismHeader">
-        <div className="container tourismNav">
-          <BrandLogo />
-
-          <nav>
-            <a href="#descubre">Descubre</a>
-            <Link href="/hoteles">Hospedaje</Link>
-            <a href="#imperdibles">Qué hacer</a>
-            <a href="#planea">Planea tu viaje</a>
-          </nav>
-
-          <div className="navTools">
-            <button type="button" aria-label="Favoritos">
-              <Heart size={19} />
-              <span>Favoritos</span>
-            </button>
-
-            <a href="#planea" className="guideButton">
-              Guía de viaje
-            </a>
+    <>
+      <SiteHeader />
+      <main>
+        <section className="homeHero">
+          <div className="homeHeroPhoto" /><div className="homeHeroOverlay" />
+          <div className="folkMarks folkMarksOne" aria-hidden="true"><i /><i /><i /></div>
+          <div className="container homeHeroContent">
+            <span className="eyebrow light">PUEBLO MÁGICO · NAYARIT</span>
+            <h1>Hay lugares que<br /><em>se quedan contigo.</em></h1>
+            <p>Ixtlán del Río te recibe entre historia, sabores, naturaleza y la calidez de su gente.</p>
+            <TourismSearch />
           </div>
-        </div>
-      </header>
+          <div className="heroCaption"><MapPin size={14} /> Ixtlán del Río, Nayarit</div>
+        </section>
 
-      <section className="tourismHero">
-        <div className="heroPhoto" />
-
-        <div className="heroWash" />
-
-        <div className="heroDecoration heroDecorationLeft">
-          <span className="leaf leafOne" />
-          <span className="leaf leafTwo" />
-          <span className="flowerDot flowerPink" />
-          <span className="flowerDot flowerGold" />
-        </div>
-
-        <div className="heroDecoration heroDecorationRight">
-          <span className="leaf leafThree" />
-          <span className="flowerDot flowerCoral" />
-        </div>
-
-        <div className="container tourismHeroContent">
-          <div className="tourismHeroCopy">
-            <span className="puebloLabel">PUEBLO MÁGICO · NAYARIT</span>
-
-            <h1>
-              Ixtlán del Río,
-              <br />
-              <em>Nayarit te espera</em>
-            </h1>
-
-            <p>
-              Historia, tradición, naturaleza y la calidez de su gente.
-              Descubre una manera diferente de vivir Ixtlán.
-            </p>
+        <section className="discoverySection">
+          <div className="container">
+            <div className="sectionHeading"><div><span className="eyebrow">EMPIEZA A DESCUBRIR</span><h2>Tu viaje, a tu manera</h2></div><p>Elige cómo quieres vivir Ixtlán y encuentra el lugar perfecto para comenzar.</p></div>
+            <div className="discoveryGrid">{discovery.map(({ title, text, href, image, icon: Icon, color }) => <Link href={href} className="discoveryCard" key={title}><img src={image} alt="" /><span className="discoveryShade" /><span className={`discoveryIcon ${color}`}><Icon size={22} /></span><div><small>{text}</small><h3>{title}</h3><span>Explorar <ArrowRight size={16} /></span></div></Link>)}</div>
           </div>
+        </section>
 
-          <TourismSearch />
-        </div>
-      </section>
+        {toriles && <section className="torilesSection"><div className="container torilesFeature"><div className="torilesPhoto"><img src="/images/los-toriles.jpg" alt={toriles.name} /><span>Patrimonio de Ixtlán</span></div><div className="torilesContent"><span className="eyebrow">UN ENCUENTRO CON LA HISTORIA</span><h2>Los Toriles</h2><p>{toriles.description}</p><div className="torilesTags">{toriles.tags.split(",").slice(0, 3).map((tag) => <span key={tag}>{tag.trim()}</span>)}</div><Link href={getRecordHref(toriles)}>Conocer este lugar <ArrowRight size={17} /></Link><div className="folkFlower" aria-hidden="true">✦</div></div></div></section>}
 
-      <section className="experienceSection" id="descubre">
-        <div className="container">
-          <div className="experienceGrid">
-            {experiences.map(({ title, subtitle, href, image, icon: Icon }) => (
-              <Link href={href} className="experienceCard" key={title}>
-                <img src={image} alt="" />
+        <section className="featuredSection"><div className="container"><div className="sectionHeading"><div><span className="eyebrow">QUÉDATE UN POCO MÁS</span><h2>Hospedajes destacados</h2></div><Link href="/hoteles">Ver todos <ArrowRight size={16} /></Link></div><div className="placeGrid homePlaces">{hotels.map((hotel) => <PlaceCard key={hotel.id} record={hotel} />)}</div></div></section>
 
-                <div className="experienceShade" />
-
-                <div className="experienceCardContent">
-                  <div className="experienceIcon">
-                    <Icon size={21} />
-                  </div>
-
-                  <div>
-                    <h2>{title}</h2>
-                    <p>{subtitle}</p>
-                  </div>
-
-                  <span className="experienceArrow">
-                    <ArrowRight size={17} />
-                  </span>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="torilesSection" id="imperdibles">
-        <div className="container torilesCard">
-          <div className="torilesImage">
-            <img src="/images/los-toriles.jpg" alt="Los Toriles, Ixtlán del Río" />
-          </div>
-
-          <div className="torilesCopy">
-            <span className="accentLabel">
-              <span>✦</span>
-              Imperdible en Ixtlán
-            </span>
-
-            <h2>Los Toriles</h2>
-
-            <p>
-              Un encuentro con la historia de Ixtlán del Río. Descubre el
-              legado arqueológico y cultural de uno de los sitios más
-              importantes del occidente de México.
-            </p>
-
-            <a href="#">
-              Conocer más
-              <ArrowRight size={16} />
-            </a>
-
-            <div className="torilesPattern" aria-hidden="true">
-              <span />
-              <span />
-              <span />
-              <span />
-              <span />
-              <span />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="featuredHotelsSection">
-        <div className="container">
-          <div className="compactSectionHeader">
-            <div>
-              <BedDouble size={21} />
-              <h2>Hospedajes destacados</h2>
-            </div>
-
-            <Link href="/hoteles">
-              Ver todos los hoteles
-              <ArrowRight size={15} />
-            </Link>
-          </div>
-
-          <div className="homeHotelGrid">
-            {hotels.map((hotel) => (
-              <Link
-                href={`/hoteles/${hotel.slug}`}
-                className="homeHotelCard"
-                key={hotel.id}
-              >
-                <div className="homeHotelImage">
-                  <img src={hotel.image_url} alt={hotel.name} />
-                  <button type="button" aria-label="Agregar a favoritos">
-                    <Heart size={16} />
-                  </button>
-                </div>
-
-                <div className="homeHotelInfo">
-                  <h3>{hotel.name}</h3>
-
-                  <p>
-                    <MapPin size={12} />
-                    {hotel.neighborhood || "Ixtlán del Río"}
-                  </p>
-
-                  <div className="hotelMiniFooter">
-                    <span>{hotel.subtype}</span>
-                    <strong>Ver hotel →</strong>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="planningSection" id="planea">
-        <div className="container planningCard">
-          <div className="planningIllustration" aria-hidden="true">
-            <div className="planningSun" />
-            <div className="planningLeaves">
-              <span />
-              <span />
-              <span />
-            </div>
-          </div>
-
-          <div className="planningCopy">
-            <span className="accentLabel">Prepárate para tu aventura</span>
-
-            <h2>Planea tu viaje a Ixtlán del Río</h2>
-
-            <p>
-              Encuentra recomendaciones y todo lo necesario para vivir una
-              experiencia inolvidable.
-            </p>
-          </div>
-
-          <div className="planningTools">
-            <div>
-              <Map size={23} />
-              <strong>Mapa</strong>
-              <span>Explora lugares</span>
-            </div>
-
-            <div>
-              <Route size={23} />
-              <strong>Itinerarios</strong>
-              <span>Rutas sugeridas</span>
-            </div>
-
-            <div>
-              <CalendarDays size={23} />
-              <strong>Agenda</strong>
-              <span>Qué está pasando</span>
-            </div>
-          </div>
-
-          <a href="#" className="planningButton">
-            Comenzar a planear
-            <ArrowRight size={17} />
-          </a>
-        </div>
-      </section>
-
-      <footer className="tourismFooter">
-        <div className="container">
-          <BrandLogo />
-
-          <p>Ixtlán del Río · Nayarit · México</p>
-        </div>
-      </footer>
-    </main>
+        <section className="planningSection"><div className="container planningPanel"><div className="planningCopy"><span className="eyebrow light">PREPARA TU VISITA</span><h2>Planea el viaje.<br /><em>Disfruta el camino.</em></h2><p>Encuentra opciones útiles para llegar, moverte y aprovechar tu estancia en Ixtlán del Río.</p><Link href="/servicios">Comenzar a planear <ArrowRight size={17} /></Link></div><div className="planningLinks"><Link href="/atractivos"><MapPin size={23} /><span><strong>Qué conocer</strong><small>Lugares esenciales</small></span><ArrowRight size={18} /></Link><Link href="/transporte"><Bus size={23} /><span><strong>Cómo llegar</strong><small>Opciones de transporte</small></span><ArrowRight size={18} /></Link><Link href="/experiencias"><Sparkles size={23} /><span><strong>Qué hacer</strong><small>Experiencias locales</small></span><ArrowRight size={18} /></Link><Link href="/buscar"><Route size={23} /><span><strong>Explora todo</strong><small>Buscador del destino</small></span><ArrowRight size={18} /></Link></div></div></section>
+      </main>
+      <SiteFooter />
+    </>
   );
 }

@@ -1,86 +1,38 @@
 "use client";
 
-import { useState } from "react";
-import {
-  BedDouble,
-  CalendarDays,
-  Compass,
-  Landmark,
-  MapPin,
-  Search,
-  Trees,
-  Utensils,
-  Users,
-} from "lucide-react";
+import { FormEvent, useState } from "react";
+import { useRouter } from "next/navigation";
+import { BedDouble, Compass, Landmark, Search, Sparkles, Utensils } from "lucide-react";
 
 const filters = [
-  { label: "Todos", icon: Compass },
-  { label: "Hoteles", icon: BedDouble },
-  { label: "Restaurantes", icon: Utensils },
-  { label: "Experiencias", icon: MapPin },
-  { label: "Naturaleza", icon: Trees },
-  { label: "Cultura", icon: Landmark },
+  { label: "Todo", value: "", icon: Compass },
+  { label: "Hospedaje", value: "Hospedaje", icon: BedDouble },
+  { label: "Restaurantes", value: "Gastronomía", icon: Utensils },
+  { label: "Atractivos", value: "Atractivo", icon: Landmark },
+  { label: "Experiencias", value: "Actividad", icon: Sparkles },
 ];
 
 export function TourismSearch() {
-  const [active, setActive] = useState("Todos");
-
+  const router = useRouter();
+  const [query, setQuery] = useState("");
+  const [category, setCategory] = useState("");
+  const submit = (event: FormEvent) => {
+    event.preventDefault();
+    const params = new URLSearchParams();
+    if (query.trim()) params.set("q", query.trim());
+    if (category) params.set("categoria", category);
+    router.push(`/buscar${params.size ? `?${params.toString()}` : ""}`);
+  };
   return (
-    <div className="heroSearch">
-      <div className="heroSearchMain">
-        <div className="heroSearchQuery">
-          <Search size={23} />
-          <div>
-            <small>¿Qué estás buscando?</small>
-            <input
-              type="search"
-              placeholder="Hoteles, restaurantes, lugares..."
-            />
-          </div>
-        </div>
-
-        <div className="heroSearchMeta">
-          <CalendarDays size={18} />
-          <div>
-            <small>Llegada</small>
-            <strong>Fecha</strong>
-          </div>
-        </div>
-
-        <div className="heroSearchMeta">
-          <CalendarDays size={18} />
-          <div>
-            <small>Salida</small>
-            <strong>Fecha</strong>
-          </div>
-        </div>
-
-        <div className="heroSearchMeta">
-          <Users size={18} />
-          <div>
-            <small>Huéspedes</small>
-            <strong>2 huéspedes</strong>
-          </div>
-        </div>
-
-        <button className="heroSearchButton" type="button">
-          Buscar
-        </button>
+    <form className="heroSearch" onSubmit={submit}>
+      <div className="heroSearchBox">
+        <Search size={22} />
+        <label><span>¿Qué quieres descubrir?</span><input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Busca lugares, sabores o experiencias…" /></label>
+        <button type="submit">Buscar</button>
       </div>
-
-      <div className="heroFilters">
-        {filters.map(({ label, icon: Icon }) => (
-          <button
-            type="button"
-            key={label}
-            className={active === label ? "active" : ""}
-            onClick={() => setActive(label)}
-          >
-            <Icon size={16} />
-            {label}
-          </button>
-        ))}
+      <div className="heroChips">
+        {filters.map(({ label, value, icon: Icon }) => <button key={label} type="button" className={category === value ? "active" : ""} onClick={() => setCategory(value)}><Icon size={15} />{label}</button>)}
       </div>
-    </div>
+    </form>
   );
 }

@@ -1,0 +1,2 @@
+"use client";
+export default function ErrorPage({ reset }: { error: Error & { digest?: string }; reset: () => void }) { return <main className="errorPage"><div className="container errorPageInner"><span className="errorCode">ALGO SALIÓ MAL</span><h1>Hagamos una pausa en el camino</h1><p>No pudimos cargar esta parte de la guía. Puedes intentarlo de nuevo.</p><button type="button" onClick={reset}>Intentar de nuevo</button></div></main>; }
